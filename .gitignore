@@ -1,0 +1,7 @@
+gen/
+libnccl.so
+model_best.t7
+checkpoints
+.zip
+datasets
+*.t7
