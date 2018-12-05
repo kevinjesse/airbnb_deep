@@ -72,6 +72,7 @@ function Trainer:train(epoch, dataloader)
 
       timer:reset()
       dataTimer:reset()
+--      break
    end
 
    local labels = {}
@@ -136,17 +137,13 @@ end
 --      local loss = self.criterion:forward(self.model.output, self.target)
 --
 --      local top1, top5 = self:computeScore(output, sample.target, nCrops)
-----      local predictions = self.computePrediction(output, nCrops)
-----
-----      print (predictions)
---
 --
 --      top1Sum = top1Sum + top1*batchSize
 --      top5Sum = top5Sum + top5*batchSize
 --      N = N + batchSize
 --
---      print((' | Test: [%d][%d/%d]    Time %.3f  Data %.3f  top1 %7.3f (%7.3f)  top5 %7.3f (%7.3f)'):format(
---         epoch, n, size, timer:time().real, dataTime, top1, top1Sum / N, top5, top5Sum / N))
+--      print((' | Test: [%d][%d/%d]    Time %.3f  Data %.3f  top1 %7.3f (%7.3f)'):format(
+--         epoch, n, size, timer:time().real, dataTime, top1, top1Sum / N))
 --
 --      timer:reset()
 --      dataTimer:reset()
@@ -154,11 +151,10 @@ end
 --   self.model:training()
 --
 --   print((' * Finished epoch # %d     top1: %7.3f  top5: %7.3f\n'):format(
---      epoch, top1Sum / N, top5Sum / N))
+--      epoch, top1Sum / N, 0))
 --
---   return top1Sum / N, top5Sum / N
+--   return top1Sum / N, 0
 --end
-
 
 function Trainer:test(epoch, dataloader)
       -- Computes the top-1 and top-5 err on the validation set
@@ -172,27 +168,64 @@ function Trainer:test(epoch, dataloader)
       local N = 0
 
       self.model:evaluate()
+      local sample_table = {}
+      local target_table = {}
+      local data = {}
       for n, sample in dataloader:run() do
          local dataTime = dataTimer:time().real
-
+         table.insert(data, sample)
          -- Copy input and target to the GPU
          self:copyInputs(sample)
-
          local output = self.model:forward(self.input):float()
-         local batchSize = output:size(1) / nCrops
+         for i, s in pairs(sample.id) do
+            if sample_table[s] == nil then
+               sample_table[s]={}
+            end
+         end
+
+--         local batchSize = output:size(1) / nCrops
+--         local loss = self.criterion:forward(self.model.output, self.target)
+         local top1, top5, predictions = self:computeScore(output, sample.target, 1)
+
+         for i, id in ipairs(sample.id) do
+            table.insert(sample_table[id], predictions[i])
+         end
+
+--         top1Sum = top1Sum + top1*batchSize
+--         top5Sum = top5Sum + top5*batchSize
+--         N = N + batchSize
+--
+--         print((' | Test: [%d][%d/%d]    Time %.3f  Data %.3f  top1 %7.3f (%7.3f)'):format(
+--            epoch, n, size, timer:time().real, dataTime, top1, top1Sum / N))
+
+         timer:reset()
+         dataTimer:reset()
+--         break
+      end
+
+      local labels = {}
+      for k, v in pairs(sample_table) do
+         labels[k] = Trainer:tally(v)
+      end
+
+      for n, sample in pairs(data) do
+         --      print(sample)
+         local dataTime = dataTimer:time().real
+         --      self:copyInputs(sample)
+         self:copyLabels(sample, labels)
+         local output = self.model:forward(self.input):float()
+         local batchSize = output:size(1)
          local loss = self.criterion:forward(self.model.output, self.target)
 
-         local top1, top5 = self:computeScore(output, sample.target, nCrops)
+         local top1 = self:computeScoreLabels(output, sample.target, 1)
+
 
          top1Sum = top1Sum + top1*batchSize
-         top5Sum = top5Sum + top5*batchSize
          N = N + batchSize
 
          print((' | Test: [%d][%d/%d]    Time %.3f  Data %.3f  top1 %7.3f (%7.3f)'):format(
             epoch, n, size, timer:time().real, dataTime, top1, top1Sum / N))
 
-         timer:reset()
-         dataTimer:reset()
       end
       self.model:training()
 
