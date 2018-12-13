@@ -10,7 +10,11 @@ See the [installation instructions](INSTALL.md) for a step-by-step guide.
 
 For Class Prediction
 
-To train on our airBnB dataset located @ /* copy our dataset and configure it with the correct torch configuration so it can be loaded with the Torch ImageNet dataloader. We have already done this and the classes can be configured at this repo /*
+To train the raw airBnB dataset located @ **[AirBnB raw data](https://drive.google.com/open?id=1NLDIJslIrmhSi_-HT6ZhzID2rU1oKxFu)** copy our dataset and configure it with the correct torch configuration so it can be loaded with the Torch ImageNet dataloader. We have already done this and the classes can be configured at this repo /*
+
+To gather your own data for airBnB published data dumps, please find our  **[data collector repository](https://github.com/kevinjesse/AirBnB)**
+
+The pre split 80/20 train test dataset with three price point classes can be found @ **[here](https://drive.google.com/open?id=109WmQqOUCVNJLJ5H8p_pFoX9T_YFpgSh)**
 
 Once configured, retrain the pretrained network with  
 ```
@@ -23,14 +27,13 @@ In this case we chose to create 3 classes on price point and retrain image net w
 
 #### Single-crop (224x224) validation error rate
 Evaluations with various ResNet implementations
-| Network       | Top-1 error | Top-5 error |
+
+| Network       | Top-1 error | Top-2 error |
 | ------------- | ----------- | ----------- |
-| ResNet-18     | 30.43       | 10.76       |
-| ResNet-34     | 26.73       | 8.74        |
-| ResNet-50     | 24.01       | 7.02        |
-| ResNet-101    | 22.44       | 6.21        |
-| ResNet-152    | 22.16       | 6.16        |
-| ResNet-200    | 21.66       | 5.79        |
+| ResNet-50     | 52.649      | 24.707      |
+| ResNet-100    | 52.649      | 24.707      |
+| ResNet-152    | 52.649      | 24.707      |
+
 
 ## Notes
 
