@@ -37,4 +37,5 @@ Evaluations with various ResNet implementations
 
 ## Notes
 
-
+**[Preliminary results ](https://github.com/kevinjesse/airbnb_deep/blob/master/Visual%20Score%20Generation%20and%20Comparison%20Metrics%20for%20Advertising.pdf
+)** 
